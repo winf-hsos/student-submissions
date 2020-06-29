@@ -1,0 +1,47 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+
+```{r}
+CoronaDaten <- read.csv("https://covid.ourworldindata.org/data/owid-covid-data.csv")
+```
+
+
+```{r}
+CoronaDE <- CoronaDaten[CoronaDaten$location== "Germany", ]
+```
+
+
+```{r}
+library(prophet)
+```
+
+
+```{r}
+CoronaDE$total_cases[CoronaDE$total_cases==0] <- NA
+y <- CoronaDE$total_cases
+ds <- CoronaDE$date
+df <- data.frame(ds, y)
+
+
+m <- prophet(df)
+
+future <- make_future_dataframe(m, periods=20)
+
+tail(future)
+
+forecast <- predict(m, future)
+
+tail(forecast)
+
+tail(forecast[c('ds','yhat', 'yhat_lower', 'yhat_upper')])
+
+plot(m, forecast)
+
+prophet_plot_components(m, forecast)
+```
